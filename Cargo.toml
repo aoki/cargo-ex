@@ -1,5 +1,5 @@
 [package]
-name = "cargo-example"
+name = "cargo-ex"
 version = "0.1.0"
 edition = "2021"
 description = "cargo run --example via fuzzy finder"
@@ -10,5 +10,4 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1.0.56"
-clap = { version = "3.1.8", features = ["derive", "env"] }
 skim = "0.9.4"

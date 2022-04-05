@@ -1,4 +1,4 @@
-use anyhow::anyhow;
+use anyhow::{anyhow, bail, Context};
 use skim::{
     prelude::{SkimItemReader, SkimOptionsBuilder},
     Skim,
@@ -10,10 +10,6 @@ use std::{
     path::PathBuf,
     process::Command,
 };
-
-fn read_examples() -> anyhow::Result<()> {
-    Ok(())
-}
 
 pub fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
     let skim_options = SkimOptionsBuilder::default()
@@ -39,17 +35,27 @@ pub fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
 }
 
 fn main() -> anyhow::Result<()> {
-    let example_dir = fs::canonicalize(PathBuf::from("./examples"))?;
-    println!("Examples directory: {}", &example_dir.to_string_lossy());
-    let example_dir = read_dir(example_dir)?;
-    let examples = example_dir
-        .into_iter()
-        .map(|f| f.unwrap().file_name().to_string_lossy().to_string())
-        .collect::<Vec<String>>();
+    let path = "./examples";
+    let example_dir = fs::canonicalize(PathBuf::from(path))
+        .with_context(|| format!("Couldn't canonicalize: {path}"))?;
+    let example_dir =
+        read_dir(example_dir).with_context(|| format!("Couldn't read directory: {path}"))?;
 
-    let example = fuzzy_find(examples)?;
+    let (entries, errors): (Vec<_>, Vec<_>) = example_dir.into_iter().partition(Result::is_ok);
+    let entries: Vec<_> = entries.into_iter().map(Result::unwrap).collect();
+    let errors: Vec<_> = errors.into_iter().map(Result::unwrap_err).collect();
+    if !errors.is_empty() {
+        bail!("Couldn't read directory: {:?}", errors);
+    }
 
-    let _ = Command::new("cargo")
+    let examples: Vec<_> = entries
+        .iter()
+        .map(|entry| entry.file_name().to_string_lossy().to_string())
+        .collect();
+
+    let example = fuzzy_find(examples).with_context(|| "Couldn't use fuzzy finder")?;
+
+    Command::new("cargo")
         .arg("run")
         .arg("--example")
         .arg(example.strip_suffix(".rs").unwrap())
