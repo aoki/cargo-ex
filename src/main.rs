@@ -12,8 +12,11 @@ use std::{
 };
 
 pub fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
+    // 2 is count line and search input line's height
+    let size = (examples.len() + 2).to_string();
     let skim_options = SkimOptionsBuilder::default()
-        .height(Some("50%"))
+        .min_height(Some(&size))
+        .height(Some(&size))
         .build()
         .map_err(|e| anyhow!(e))?;
     let examples_string = examples.join("\n");
