@@ -1,3 +1,6 @@
+//! # cargo ex
+//! This cargo sub-command execute `cargo run --example` easily via fuzzy finder.
+
 use anyhow::{anyhow, bail, Context};
 use skim::{
     prelude::{SkimItemReader, SkimOptionsBuilder},
@@ -11,7 +14,7 @@ use std::{
     process::Command,
 };
 
-pub fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
+fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
     // 2 is count line and search input line's height
     let size = (examples.len() + 2).to_string();
     let skim_options = SkimOptionsBuilder::default()

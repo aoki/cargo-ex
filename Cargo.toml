@@ -2,11 +2,9 @@
 name = "cargo-ex"
 version = "0.1.0"
 edition = "2021"
-description = "cargo run --example via fuzzy finder"
+description = "This cargo sub-command execute `cargo run --example` easily via fuzzy finder."
 authors = ["aoki <aoki@aoki.dev>"]
 license = "MIT"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.56"
