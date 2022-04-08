@@ -4,6 +4,12 @@ This cargo sub-command execute `cargo run --example` easily via fuzzy finder.
 
 <video style="border-radius: 6px;" src="https://user-images.githubusercontent.com/1206676/162441748-c917fc08-a0c3-4fd6-bdb4-49adfcfce0ed.mp4" width="100%"></video>
 
+## Install
+
+`cargo install cargo-ex`
+
+## Usage
+
 There are some files in the `examples` directory.
 
 ```shellsession
