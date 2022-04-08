@@ -1,10 +1,12 @@
 [package]
 name = "cargo-ex"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "This cargo sub-command execute `cargo run --example` easily via fuzzy finder."
 authors = ["aoki <aoki@aoki.dev>"]
 license = "MIT"
+repository = "https://github.com/aoki/cargo-ex"
+keywords = ["cargo", "example"]
 
 [dependencies]
 anyhow = "1.0.56"
