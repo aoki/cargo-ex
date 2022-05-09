@@ -40,24 +40,30 @@ fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
         .map(|m| m.clone())
 }
 
-fn main() -> anyhow::Result<()> {
-    let path = "./examples";
-    let example_dir = fs::canonicalize(PathBuf::from(path))
-        .with_context(|| format!("Couldn't canonicalize: {path}"))?;
-    let example_dir =
-        read_dir(example_dir).with_context(|| format!("Couldn't read directory: {path}"))?;
+fn get_files(path: String) -> anyhow::Result<Vec<String>> {
+    let target_dir = fs::canonicalize(PathBuf::from(&path))
+        .with_context(|| format!("Couldn't canonicalize: {}", &path))?;
+    let target_dir =
+        read_dir(target_dir).with_context(|| format!("Couldn't read directory: {path}"))?;
 
-    let (entries, errors): (Vec<_>, Vec<_>) = example_dir.into_iter().partition(Result::is_ok);
+    let (entries, errors): (Vec<_>, Vec<_>) = target_dir.into_iter().partition(Result::is_ok);
     let entries: Vec<_> = entries.into_iter().map(Result::unwrap).collect();
     let errors: Vec<_> = errors.into_iter().map(Result::unwrap_err).collect();
     if !errors.is_empty() {
         bail!("Couldn't read directory: {:?}", errors);
     }
 
-    let examples: Vec<_> = entries
+    let mut examples: Vec<_> = entries
         .iter()
         .map(|entry| entry.file_name().to_string_lossy().to_string())
         .collect();
+    examples.sort();
+
+    Ok(examples)
+}
+
+fn main() -> anyhow::Result<()> {
+    let examples = get_files("./examples".to_string())?;
 
     let example = fuzzy_find(examples).with_context(|| "Couldn't use fuzzy finder")?;
 
@@ -68,4 +74,26 @@ fn main() -> anyhow::Result<()> {
         .exec();
 
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use crate::get_files;
+
+    #[test]
+    fn get_target_files() {
+        let mut expected = vec![
+            "hello-cargo.rs",
+            "hello-example.rs",
+            "hello-rust.rs",
+            "hello-wave.rs",
+        ];
+        expected.sort();
+        let expected = expected
+            .into_iter()
+            .map(|e| e.to_string())
+            .collect::<Vec<String>>();
+        let actual = get_files("./examples".to_string()).unwrap();
+        assert_eq!(actual, expected);
+    }
 }
