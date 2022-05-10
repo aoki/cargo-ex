@@ -26,7 +26,7 @@ fn fuzzy_find(examples: Vec<String>) -> anyhow::Result<String> {
     let item_reader = SkimItemReader::default().of_bufread(Cursor::new(examples_string));
     let selected_items = Skim::run_with(&skim_options, Some(item_reader))
         .map(|out| out.selected_items)
-        .unwrap_or_else(|| Vec::new());
+        .unwrap_or_else(Vec::new);
 
     let selected = selected_items
         .iter()
